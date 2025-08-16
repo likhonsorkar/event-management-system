@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}EMS{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="font-sans bg-gray-100">
+  <!-- Navbar -->
+  <header x-data="{ open: false }" class="sticky top-0 bg-white shadow-md z-50">
+    <nav class="container mx-auto flex items-center justify-between py-4 px-6">
+      <!-- Logo -->
+      <div class="text-2xl font-bold text-blue-600">
+        <a href="#">Event Manager</a>
+      </div>
+      <!-- Desktop Menu -->
+      <ul class="hidden md:flex space-x-8 text-gray-700 font-medium">
+        <li><a href="#home" class="hover:text-blue-600">Home</a></li>
+        <li><a href="{% url 'eventlist' %}" class="hover:text-blue-600">Events</a></li>
+        <li><a href="{% url 'category_read' %}" class="hover:text-blue-600">Category</a></li>
+        <li><a href="{% url 'participent_read' %}" class="hover:text-blue-600">Participent User</a></li>
+      </ul>
+      <!-- Mobile Button -->
+      <button @click="open = !open" class="md:hidden focus:outline-none">
+        <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </nav>
+    <!-- Mobile Menu -->
+    <div x-show="open" @click.outside="open = false"
+         class="md:hidden bg-white shadow-lg px-6 py-4 space-y-4 text-gray-700 font-medium">
+      <a href="#home" class="block hover:text-blue-600">Home</a>
+      <a href="{% url 'eventlist' %}" class="block hover:text-blue-600">Events</a>
+      <a href="{% url 'category_read' %}" class="block hover:text-blue-600">Category</a>
+      <a href="{% url 'participent_read' %}" class="block hover:text-blue-600">Participent User</a>
+    </div>
+  </header>
+    <main class="max-w-6xl mx-auto p-4 py-20">
+        {% if messages %}
+        <div class="space-y-2 mb-4">
+            {% for message in messages %}
+            <div class="p-3 rounded-md
+                        {% if message.tags == 'success' %}bg-green-100 text-green-800
+                        {% elif message.tags == 'error' %}bg-red-100 text-red-800
+                        {% else %}bg-blue-100 text-blue-800{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

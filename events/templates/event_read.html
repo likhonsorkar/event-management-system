@@ -1,0 +1,36 @@
+{% extends 'template.html' %}
+{% block title %}Event List{% endblock %}
+{% block content %}
+<section id="events">
+  <div class="container mx-auto px-6">
+    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Events List</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Event Card -->
+       {% for event in events %}
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition">
+            <div class="p-6">
+            <h3 class="text-xl font-semibold text-blue-600 mb-2">{{event.name}}</h3>
+            <p class="text-gray-600">{{event.description}}</p>
+            <div class="flex items-center justify-between text-sm text-gray-500">
+                <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-medium">
+                {{event.category.name}}
+                </span>
+                <span>👥 {{event.participants.count}} Participants</span>
+            </div>
+            <div class="m-1 flex  justify-center space-x-2 mb-2 ">
+              <a href="" 
+                class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600">Edit</a>
+              <a href="" 
+                class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Delete</a>
+            </div>
+            </div>
+        </div>
+       {% endfor %}   
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+
+
