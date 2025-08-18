@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls import include
 from django.urls import path
+from events.views import event_home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', event_home, name="event_home"),
     path("event/", include("events.urls")),  
 ]
 
