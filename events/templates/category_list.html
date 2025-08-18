@@ -1,34 +1,42 @@
 {% extends 'template.html' %}
-{% block title %}Event List{% endblock %}
+{% block title %}Category List{% endblock %}
 {% block content %}
-<section id="categories">
-  <div class="container mx-auto">
-    <h2 class="text-3xl md:text-4xl font-bold text-center mb-7">Category List</h2>
-     <a href="{% url 'category_create' %}" 
-       class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 text-right">
-       + Add Category
-    </a>
-    <div class="mt-4 grid md:grid-cols-3 gap-8">
-      <!-- Category Card -->
-       {% for category in categories %}
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition">
-            <div class="p-6">
-            <h3 class="text-xl font-semibold text-blue-600 mb-2">{{category.name}}</h3>
-            <p class="text-gray-600">{{category.description}}</p>
-            </div>
-             <div class="m-1 flex  justify-center space-x-2 mb-2 ">
-              <a href="{% url 'category_update' category.id %}" 
-                class="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600">Edit</a>
-              <a href="{% url 'category_delete' category.id %}" 
-                class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Delete</a>
-            </div>
+<section id="categories" class="py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+
+        <div class="flex flex-col sm:flex-row items-center justify-between mb-8">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center sm:text-left mb-4 sm:mb-0">All Event Categories</h2>
+            <a href="{% url 'category_create' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Create Category
+            </a>
         </div>
-       {% endfor %}   
-      </div>
+
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {% for category in categories %}
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden border border-gray-200">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 leading-snug">{{ category.name }}</h3>
+                    <p class="mt-2 text-sm text-gray-600 line-clamp-3">{{ category.description }}</p>
+
+                    <div class="mt-6 flex justify-end space-x-2">
+                        <a href="{% url 'category_update' category.id %}" class="py-2 px-4 rounded-lg text-sm font-semibold text-green-700 bg-green-100 hover:bg-green-200 transition">
+                            Edit
+                        </a>
+                        <a href="{% url 'category_delete' category.id %}" class="py-2 px-4 rounded-lg text-sm font-semibold text-red-700 bg-red-100 hover:bg-red-200 transition">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="lg:col-span-3 text-center py-10">
+                <p class="text-xl text-gray-500 italic">No categories found. Be the first to add one!</p>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-  </div>
 </section>
 {% endblock %}
-
-
-
