@@ -22,7 +22,7 @@ from events.views import event_home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', event_home, name="event_home"),
+    path('', event_home, name="home"),
     path("event/", include("events.urls")),  
 ]
 
