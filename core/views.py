@@ -1,11 +1,73 @@
-from django.shortcuts import render,redirect
-from events.models import Events,Category, Participant
-from events.forms import *
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib import messages
-# Create your views here.
+from .forms import RegistrationFrom, LoginForm, CategoryForm, EventsForm, ParticipantForm
+from .models import Events, Category, Participant
+User = get_user_model()
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationFrom(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.is_active = False
+            form.save()
+            messages.success(request, 'Registration successful. You can\'t now log in. Please check your email and active your accout to login')
+            return redirect('login')
+    else:
+        form = RegistrationFrom()
+    return render(request, 'registration.html', {'form': form})
+
+def active_account(request, user_id, token):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, "Invalid activation link.")
+        return redirect('login')  # redirect to login or error page
+    if default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, "Your account has been activated successfully. You can now log in.")
+        return redirect('login')
+    else:
+        messages.error(request, "Activation link is invalid or has expired.")
+        return redirect('login')
+    
+def user_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                messages.error(request, 'Invalid username or password.')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
+
+def role_dash(request):
+
+    return redirect("admin_dashboard")
+
+def admin_dash(request):
+    event = Events.objects.select_related("category").prefetch_related("participants").all()
+    return render(request, "dashboard/admindashboard.html", {'events':event})
+
+def user_logout(request):
+    logout(request)
+    return redirect('login')
+
 def event_home(request):
     event = Events.objects.select_related('category').prefetch_related('participants').all()
-    return render(request, "home.html", {"coming_soon": event})
+    return render(request, "home.html", {"events": event})
 def event_detail(request, id):
     event = Events.objects.get(id=id)
     return render(request, "event_info.html", {"event": event})

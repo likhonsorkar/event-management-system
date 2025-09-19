@@ -19,18 +19,29 @@
                     <a href="{% url 'home' %}" class="relative hover:text-white transition-colors duration-300">Home<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
                     </a>
                 </li>
-                <li class="group">
-                    <a href="{% url 'eventlist' %}" class="relative hover:text-white transition-colors duration-300">Events<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a href="{% url 'category_read' %}" class="relative hover:text-white transition-colors duration-300">Category<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a href="{% url 'participent_read' %}" class="relative hover:text-white transition-colors duration-300">Participent<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
-                    </a>
-                </li>
+                {% if user.is_authenticated %}
+                    <li class="group">
+                        <a href="{% url 'eventlist' %}" class="relative hover:text-white transition-colors duration-300">Events<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
+                        </a>
+                    </li>
+                    <li class="group">
+                        <a href="{% url 'category_read' %}" class="relative hover:text-white transition-colors duration-300">Category<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
+                        </a>
+                    </li>
+                    <li class="group">
+                        <a href="{% url 'user_logout' %}" class="relative hover:text-white transition-colors duration-300">Logout<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="group">
+                        <a href="{% url 'login' %}" class="relative hover:text-white transition-colors duration-300">Login<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
+                        </a>
+                    </li>
+                    <li class="group">
+                        <a href="{% url 'register' %}" class="relative hover:text-white transition-colors duration-300">Register<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
             <button @click="open = !open" class="md:hidden focus:outline-none">
                 <svg class="w-8 h-8 text-white transition-all duration-300 ease-in-out" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">

@@ -18,12 +18,14 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls import include
 from django.urls import path
-from events.views import event_home
+from core.views import active_account
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', event_home, name="home"),
-    path("event/", include("events.urls")),  
+    path('superadmin/', admin.site.urls),
+    path("", include("core.urls")), 
+    path("admin/", include("admin.urls")),
+    path("users/activate/<int:user_id>/<str:token>/", active_account)
+
 ]
 
 if settings.DEBUG:

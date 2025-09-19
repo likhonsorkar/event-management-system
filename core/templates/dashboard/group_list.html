@@ -1,0 +1,44 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Group List and Permission{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4">Group List and Permission</h2>
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">Group Name</th>
+                <th class="py-2 px-4 border-b">Permissions</th>
+                <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="py-2 px-4 border-b">Admin</td>
+                <td class="py-2 px-4 border-b">All</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="#" class="text-blue-500 hover:underline">Edit</a>
+                    <a href="#" class="text-red-500 hover:underline ml-4">Delete</a>
+                </td>
+            </tr>
+            <tr>
+                <td class="py-2 px-4 border-b">Editor</td>
+                <td class="py-2 px-4 border-b">Create, Read, Update</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="#" class="text-blue-500 hover:underline">Edit</a>
+                    <a href="#" class="text-red-500 hover:underline ml-4">Delete</a>
+                </td>
+            </tr>
+            <tr>
+                <td class="py-2 px-4 border-b">Viewer</td>
+                <td class="py-2 px-4 border-b">Read</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="#" class="text-blue-500 hover:underline">Edit</a>
+                    <a href="#" class="text-red-500 hover:underline ml-4">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

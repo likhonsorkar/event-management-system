@@ -1,0 +1,37 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Create Group{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4">Create Group</h2>
+    <form>
+        <div class="mb-4">
+            <label for="group_name" class="block text-gray-700">Group Name</label>
+            <input type="text" id="group_name" name="group_name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700">Permissions</label>
+            <div class="flex flex-wrap">
+                <label class="inline-flex items-center mr-4">
+                    <input type="checkbox" class="form-checkbox" name="permissions" value="create">
+                    <span class="ml-2">Create</span>
+                </label>
+                <label class="inline-flex items-center mr-4">
+                    <input type="checkbox" class="form-checkbox" name="permissions" value="read">
+                    <span class="ml-2">Read</span>
+                </label>
+                <label class="inline-flex items-center mr-4">
+                    <input type="checkbox" class="form-checkbox" name="permissions" value="update">
+                    <span class="ml-2">Update</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" class="form-checkbox" name="permissions" value="delete">
+                    <span class="ml-2">Delete</span>
+                </label>
+            </div>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Create Group</button>
+    </form>
+</div>
+{% endblock %}

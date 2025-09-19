@@ -1,0 +1,10 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Event List{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4">Event List</h2>
+    {% include 'event_read.html' %}
+</div>
+{% endblock %}
