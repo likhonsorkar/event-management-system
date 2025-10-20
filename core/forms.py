@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Category, Events, Participant
+from .models import Category, Events
 
 class StyleMixin:
     default_class = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
@@ -12,7 +12,7 @@ class StyleMixin:
             existing_classes = widget.attrs.get("class", "")
             widget.attrs["class"] = f"{self.default_class} {existing_classes}".strip()
 class RegistrationFrom(StyleMixin, forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
     password2 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
 
     class Meta:
@@ -46,24 +46,4 @@ class EventsForm(StyleMixin, forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": 4}),
             "date": forms.DateInput(attrs={"type": "date"}),
             "time": forms.TimeInput(attrs={"type": "time"}),
-}
-
-class EventsForm(StyleMixin,forms.ModelForm):
-    class Meta:
-        model = Events
-        fields = ["name", "description", "date", "time", "location", "category"]
-        widgets = {
-            "name": forms.TextInput(),
-            "description": forms.Textarea(),
-            "date": forms.DateInput(),
-            "time": forms.TimeInput(),
-            "location": forms.TextInput(attrs={"class": "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"}),
-            "category": forms.Select(attrs={"class": "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"}),
-}
-class ParticipantForm(StyleMixin, forms.ModelForm):
-    class Meta:
-        model = Participant
-        fields = ["name", "email", "events"]
-        widgets = {
-            "events": forms.CheckboxSelectMultiple(),  # keep special widget
 }

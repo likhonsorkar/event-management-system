@@ -1,12 +1,15 @@
 from django.urls import path
-from .views import *
+from core.views import *
+from admin.views import assign_role
 
 urlpatterns = [
     path('register/', register, name='register'),
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='user_logout'),
     path('dashboard/', role_dash, name='dashboard'),
-    path('admindashboard/', admin_dash, name='admin_dashboard'),
+    path('admindashboard/', admin_dashboard, name='admin_dashboard'),
+    path('organizerdashboard/', organizer_dashboard, name='organizer_dashboard'),
+    path('participantdashboard/', participant_dashboard, name='participant_dashboard'),
     
     path("categorylist/", category_read, name="category_read"),
     path("categories_create/", category_create, name="category_create"),
@@ -18,12 +21,11 @@ urlpatterns = [
     path('event_delete/<int:id>', event_delete, name="event_delete"),
     path('event_update/<int:id>', event_update, name="event_update"),
     path("event/<int:id>/", event_detail, name="event_detail"),
+    path('join_event/<int:event_id>/', join_event, name='join_event'),
+    path('leave_event/<int:event_id>/', leave_event, name='leave_event'),
 
-
-    path("participentlist", participent_read, name="participent_read"),
-    path("participent_create", participent_create, name="participent_create"),
-    path('participent_delete/<int:id>', participen_delete, name="paricipent_delete"),
-    path('participent_update/<int:id>', participent_update, name="participent_update"),
+    path('user_list/', user_list, name='user_list'),
+    path('assign_role/<int:user_id>/', assign_role, name='assign_role'),
 
     path('', event_home, name="home")
 ]

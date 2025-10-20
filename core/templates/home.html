@@ -17,11 +17,17 @@
             <h2 class="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent text-center sm:text-left mb-4 sm:mb-0">
                 Events
             </h2>
+            {% if user.is_authenticated %}
             <a href="{% url 'event_create' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg> Create Event
             </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                Join Now
+            </a>
+            {% endif %}
         </div>
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {% for event in events %}

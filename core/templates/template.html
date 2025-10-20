@@ -21,6 +21,10 @@
                 </li>
                 {% if user.is_authenticated %}
                     <li class="group">
+                        <a href="{% url 'dashboard' %}" class="relative hover:text-white transition-colors duration-300">Dashboard<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
+                        </a>
+                    </li>
+                    <li class="group">
                         <a href="{% url 'eventlist' %}" class="relative hover:text-white transition-colors duration-300">Events<span class="absolute block w-full h-0.5 bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-left bottom-0 left-0"></span>
                         </a>
                     </li>
@@ -55,7 +59,7 @@
             <a href="#home" class="block hover:text-white transition-colors duration-300">Home</a>
             <a href="{% url 'eventlist' %}" class="block hover:text-white transition-colors duration-300">Events</a>
             <a href="{% url 'category_read' %}" class="block hover:text-white transition-colors duration-300">Category</a>
-            <a href="{% url 'participent_read' %}" class="block hover:text-white transition-colors duration-300">Participent User</a>
+            <a href="{% url 'user_logout' %}" class="block hover:text-white transition-colors duration-300">Logout</a>
         </div>
     </header>
 <section class="relative w-full h-[200px]">

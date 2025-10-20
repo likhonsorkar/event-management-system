@@ -1,51 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Admin Dashboard{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-    <nav class="bg-gray-800 p-4 text-white">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="text-lg font-bold">
-                <a href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
-            </div>
-            <div class="hidden md:flex space-x-4">
-                <a href="{% url 'admin_dashboard' %}" class="hover:text-gray-400">Dashboard</a>
-                <a href="event_list.html" class="hover:text-gray-400">Event List</a>
-            </div>
-            <div class="md:hidden">
-                <button id="menu-btn" class="focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </nav>
-    <div id="mobile-menu" class="hidden md:hidden bg-gray-800 text-white p-4">
-        <a href="{% url 'admin_dashboard' %}" class="block py-2 hover:text-gray-400">Dashboard</a>
-        <a href="#" class="block py-2 hover:text-gray-400">Group List and Permission</a>
-        <a href="#" class="block py-2 hover:text-gray-400">Create Group</a>
-        <a href="#" class="block py-2 hover:text-gray-400">User List with Group</a>
-    </div>
+{% extends "template.html" %}
 
-    <div class="container mx-auto p-4">
-        {% block content %}
-        {% endblock %}
-    </div>
-
-    <script>
-        document.getElementById('menu-btn').addEventListener('click', function() {
-            var mobileMenu = document.getElementById('mobile-menu');
-            if (mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.remove('hidden');
-            } else {
-                mobileMenu.classList.add('hidden');
-            }
-        });
-    </script>
-</body>
-</html>
+{% block content %}
+<div class="container mx-auto p-4">
+    {% block dashboard_content %}{% endblock %}
+</div>
+{% endblock %}
