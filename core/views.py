@@ -7,10 +7,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib import messages
 from .forms import RegistrationFrom, LoginForm, CategoryForm, EventsForm
 from .models import Events, Category
-from django.http import HttpResponse
-
 User = get_user_model()
-
 def is_admin(user):
     return user.groups.filter(name='admin').exists()
 def is_organizer(user):
@@ -40,7 +37,6 @@ def register(request):
     else:
         form = RegistrationFrom()
     return render(request, 'registration.html', {'form': form})
-
 def active_account(request, user_id, token):
     try:
         user = User.objects.get(id=user_id)
@@ -55,7 +51,6 @@ def active_account(request, user_id, token):
     else:
         messages.error(request, "Activation link is invalid or has expired.")
         return redirect('login')
-    
 def user_login(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -75,7 +70,6 @@ def user_login(request):
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
-
 @login_required
 def role_dash(request):
     role = get_user_role(request.user)
@@ -87,7 +81,6 @@ def role_dash(request):
         return redirect('participant_dashboard')
     else:
         return redirect('login')
-
 @login_required
 def admin_dashboard(request):
     user_count = User.objects.count()
@@ -99,7 +92,6 @@ def admin_dashboard(request):
         'category_count': category_count,
     }
     return render(request, 'dashboard/admindashboard.html', context)
-
 @login_required
 def organizer_dashboard(request):
     events = Events.objects.filter(organizer=request.user)
@@ -107,7 +99,6 @@ def organizer_dashboard(request):
         'events': events,
     }
     return render(request, 'dashboard/organizer_dashboard.html', context)
-
 @login_required
 def participant_dashboard(request):
     events = Events.objects.filter(participants=request.user)
@@ -118,7 +109,6 @@ def participant_dashboard(request):
 def user_logout(request):
     logout(request)
     return redirect('login')
-
 def event_home(request):
     latest_events = Events.objects.order_by('-date')[:3]
     return render(request, "home.html", {"events": latest_events})
@@ -132,7 +122,6 @@ def join_event(request, event_id):
         event.participants.add(request.user)
         messages.success(request, "You have successfully joined the event.")
     return redirect('event_detail', id=event_id)
-
 @login_required
 def leave_event(request, event_id):
     event = Events.objects.get(id=event_id)
@@ -142,11 +131,8 @@ def leave_event(request, event_id):
     else:
         messages.warning(request, "You are not participating in this event.")
     return redirect('event_detail', id=event_id)
-
-
 def is_admin_or_organizer(user):
     return user.groups.filter(name__in=['admin', 'organizer']).exists()
-
 @login_required
 @user_passes_test(is_admin_or_organizer)
 def event_create(request):
@@ -169,7 +155,6 @@ def event_read(request, id=None):
         return render(request, "event_info.html", context)
     event = Events.objects.select_related("category").prefetch_related("participants").all()
     return render(request, "event_read.html", {'events':event})
-
 def event_detail(request, id=None):
     if id:
         event = Events.objects.get(id=id)
@@ -198,7 +183,6 @@ def event_update(request, id):
     else:
         form = EventsForm(instance=event)
     return render(request, "form.html", {"form": form, "title": "Update Event"})
-
 @login_required
 def event_delete(request, id):
     event = Events.objects.get(id=id)
@@ -248,7 +232,6 @@ def category_delete(request, id):
         return redirect("category_read")
     else:
         return render(request, "delete.html", {"object": category, "type": "Category"})
-
 @login_required
 @user_passes_test(is_admin)
 def user_list(request):
