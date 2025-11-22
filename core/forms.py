@@ -2,7 +2,7 @@ from django import forms
 from core.models import CustomUser as User
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Category, Events
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm, SetPasswordForm
 
 class StyleMixin:
     """ Mixing to apply style to form field"""
@@ -83,4 +83,10 @@ class ProfileUpdateForm(StyleMixin, forms.ModelForm):
         fields = ["username","first_name", "last_name", "email", "phone", "profile_picture"]
 
 class UpdatePasswordForm(StyleMixin, PasswordChangeForm):
+    pass
+class CustomPasswordResetForm(StyleMixin, PasswordResetForm):
+    pass
+
+
+class CustomPasswordResetConfirmForm(StyleMixin, SetPasswordForm):
     pass

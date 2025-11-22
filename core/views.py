@@ -9,7 +9,7 @@ from .models import CustomUser as User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib import messages
-from .forms import RegistrationFrom, LoginForm, CategoryForm, EventsForm, ProfileUpdateForm, UpdatePasswordForm
+from .forms import RegistrationFrom, LoginForm, CategoryForm, EventsForm, ProfileUpdateForm, UpdatePasswordForm, CustomPasswordResetForm, CustomPasswordResetConfirmForm
 from core.models import Events, Category, CustomUser
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 User = get_user_model()
@@ -231,7 +231,11 @@ class Event_update(LoginRequiredMixin,UserPassesTestMixin, UpdateView):
     pk_url_kwarg = 'id'
     template_name = "form.html"
     def test_func(self):
-       return is_admin_or_organizer(self.request.user)
+       event = self.get_object()
+       return self.request.user == event.organizer or self.request.user.is_superuser
+    def handle_no_permission(self):
+        messages.error(self.request, self.permission_denied_message)
+        return redirect('eventlist')
     def get_success_url(self):
         messages.success(self.request, "Event Update Succesfull")
         return reverse_lazy('eventlist')
@@ -261,7 +265,10 @@ class EventDelete(LoginRequiredMixin, UserPassesTestMixin,DeleteView):
 
     def test_func(self):
        event = self.get_object()
-       return self.request.user == event.organizer or is_admin(self.request.user)
+       return self.request.user == event.organizer or self.request.user.is_superuser
+    def handle_no_permission(self):
+        messages.error(self.request, self.permission_denied_message)
+        return redirect('eventlist')
     def delete(self, request, *args, **kwargs):
         messages.success(request, "Event Delete Successful")
         return super().delete(request, *args, **kwargs)
@@ -335,15 +342,29 @@ class ChangePasswordDone(PasswordChangeDoneView):
     template_name = "profile/password_done.html"
 
 class UserPasswordResetView(PasswordResetView):
-    template_name = "auth/password_reset.html"
-    email_template_name = "auth/password_reset_email.html"
-    subject_template_name = "auth/password_reset_subject.txt"
-    success_url = reverse_lazy("password_reset_done")
-class UserPasswordResetDoneView(PasswordResetDoneView):
-    template_name = "auth/password_reset_done.html"
+    form_class = CustomPasswordResetForm
+    template_name = 'password_reset.html'
+    success_url = reverse_lazy('login')
+    html_email_template_name = 'reset_email.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['protocol'] = 'https' if self.request.is_secure() else 'http'
+        context['domain'] = self.request.get_host()
+        print(context)
+        return context
+
+    def form_valid(self, form):
+        messages.success(
+            self.request, 'A Reset email sent. Please check your email')
+        return super().form_valid(form)
 class UserPasswordResetConfirmView(PasswordResetConfirmView):
-    template_name = "auth/password_reset_confirm.html"
-    success_url = reverse_lazy("password_reset_complete")
-class UserPasswordResetCompleteView(PasswordResetCompleteView):
-    template_name = "auth/password_reset_complete.html"
+    form_class = CustomPasswordResetConfirmForm
+    template_name = 'password_reset.html'
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        messages.success(
+            self.request, 'Password reset successfully')
+        return super().form_valid(form)
 

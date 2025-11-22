@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Password Reset</title>
+    <style>
+        body {
+            margin: 0;
+            background: #eef2f7;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        .wrapper {
+            width: 100%;
+            padding: 20px 0;
+        }
+        .email-box {
+            width: 100%;
+            max-width: 620px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e4e7eb;
+        }
+        .header {
+            background: linear-gradient(135deg, #004aad, #0075ff);
+            color: #ffffff;
+            padding: 28px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 28px 32px;
+            color: #333333;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+        .btn {
+            display: inline-block;
+            margin: 22px 0;
+            background: #0075ff;
+            padding: 12px 28px;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .info-box {
+            margin: 20px 0;
+            padding: 16px;
+            background: #f1f5ff;
+            border-left: 4px solid #0075ff;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #444444;
+        }
+        .footer {
+            background: #fafbfc;
+            text-align: center;
+            padding: 18px;
+            color: #888888;
+            font-size: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .footer a {
+            color: #0075ff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="email-box">
+
+            <div class="header">
+                <h1>Password Reset</h1>
+            </div>
+
+            <div class="content">
+                <p>Hi <strong>{{ user.get_full_name|default:user.username }}</strong>,</p>
+
+                <p>You requested a password reset for your account.  
+                Click the button below to set a new password:</p>
+
+                <p>
+                    <a href="{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}" class="btn">
+                        Reset Password
+                    </a>
+                </p>
+
+                <div class="info-box">
+                    This link is valid for the next <strong>24 hours</strong>.  
+                    If you didn’t request this change, you can safely ignore this email.
+                </div>
+
+                <p>Thanks,<br>  
+                <strong>Likhon.com.bd Team</strong></p>
+            </div>
+
+            <div class="footer">
+                &copy; {{ year }} YourWebsite. All rights reserved.  
+                <br>
+                Need help? Email us at 
+                <a href="mailto:contact@likhon.com.bd">contact@likhon.com.bd</a>.
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
