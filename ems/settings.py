@@ -125,6 +125,9 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' # Or specify your desired path
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -140,3 +143,5 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = "no_reply@likhon.com.bd"
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+AUTH_USER_MODEL = 'core.CustomUser'
