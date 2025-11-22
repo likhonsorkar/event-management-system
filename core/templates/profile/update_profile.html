@@ -1,0 +1,19 @@
+{% extends "template.html" %}
+{% load static %}
+{% block title %}Edit Profile{% endblock %}
+{% block hero_title %}Edit Profile{% endblock %}
+{% block content %}
+<div class="bg-white shadow-lg rounded-xl p-8 max-w-3xl mx-auto">
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" 
+                 class="w-24 h-24 object-cover rounded-full mt-3 shadow">
+        {% endif %}
+        {{form}}
+        <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+            Save Changes
+        </button>
+    </form>
+</div>
+{% endblock %}

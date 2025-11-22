@@ -19,9 +19,10 @@ from django.conf import settings
 from django.conf.urls import include
 from django.urls import path
 from core.views import active_account
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('superadmin/', admin.site.urls),
+    path('superadmin/', admin.site.urls, name='admin'),
     path("", include("core.urls")), 
     path("admin/", include("admin.urls")),
     path("users/activate/<int:user_id>/<str:token>/", active_account)
@@ -33,3 +34,5 @@ if settings.DEBUG:
     urlpatterns += [
         path('__debug__/', include(debug_toolbar.urls)),
     ]
+if settings.DEBUG:
+        urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
