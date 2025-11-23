@@ -9,7 +9,7 @@ User = get_user_model()
 def send_activation_email(sender, instance, created, **kwargs):
     if created:
         token = default_token_generator.make_token(instance)
-        activation_url = f"https://demo.likhon.com.bd/ems/users/activate/{instance.pk}/{token}"
+        activation_url = f"https://ems.likhon.com.bd/users/activate/{instance.pk}/{token}"
 
         subject = "Activate your Event Management System account"
         message = (
