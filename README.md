@@ -39,39 +39,6 @@
 
 ---
 
-## ⚙️ Installation & Setup
-
-### 1. Clone & Environment
-```bash
-git clone https://github.com/yourusername/evently.git
-cd evently
-python -m venv .venv
-source .venv/bin/activate  # Unix
-.venv\Scripts\activate     # Windows
-pip install -r requirements.txt
-```
-
-### 2. Configuration (`.env`)
-Create a `.env` file in the root directory:
-```env
-DEBUG=True
-SECRET_KEY=your-secret-key
-EMAIL_HOST=smtp.gmail.com
-EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-app-password
-SITE_DOMAIN=evently.likhon.com.bd
-SITE_PROTOCOL=https
-```
-
-### 3. Database & Roles
-```bash
-python manage.py migrate
-python manage.py createsuperuser
-# Ensure 'admin', 'organizer', and 'participant' groups are created in Django Admin
-```
-
----
-
 ## 📊 Role Permissions Overview
 
 | Feature | Participant | Organizer | Admin |
@@ -83,15 +50,6 @@ python manage.py createsuperuser
 | Approve Events | ❌ | ❌ | ✅ |
 | Manage Users | ❌ | ❌ | ✅ |
 | Manage Categories | ❌ | ❌ | ✅ |
-
----
-
-## 🤝 Contributing
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ---
 
