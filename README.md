@@ -4,25 +4,50 @@
 
 ---
 
-## 🚀 Key Features
+## 🌟 Key Features
 
 ### 🔐 Enterprise-Grade Security
-- **Email Activation:** Automatic account inactivation upon registration with secure email verification links handled via **Django Signals**.
-- **Role-Based Access Control (RBAC):**
-  - 🛡️ **Admin:** Platform-wide oversight, user management, category creation, and event approval.
-  - 🎤 **Organizer:** Create and manage personal events, track participants.
-  - 👤 **Participant:** Personal dashboard, event discovery, and one-click join/leave functionality.
-- **Secure Password Reset:** Fully integrated SMTP-based password recovery.
+- **Email Activation:** Secure verification links powered by **Django Signals**. New accounts are locked until activated via email.
+- **RBAC (Role-Based Access Control):** Granular permissions for Admins, Organizers, and Participants.
+- **Secure Auth:** Industry-standard password hashing and secure session management.
+- **Password Recovery:** Fully integrated SMTP-based forgot password workflow.
 
-### 📅 Advanced Event Discovery
-- **Live Search & Filtering:** Real-time event search by name and filtering by categories.
-- **Participation Tracking:** Monitor attendee counts and participant lists.
-- **Approval Workflow:** Optional admin review for new events to ensure quality.
+### 📅 Event Management & Discovery
+- **Dynamic Homepage:** Live statistics showing platform activity (Events, Users, Locations, Categories).
+- **Advanced Search:** Real-time event searching by name and instant category filtering.
+- **Approval Workflow:** Admins can review and approve events before they go live.
+- **Participation System:** One-click Join/Leave functionality with real-time attendee tracking.
 
 ### 🎨 Premium UI/UX
-- **Responsive & Modern:** Built with a "Mobile-First" philosophy.
-- **Adaptive Dark Mode:** High-contrast dark theme for better accessibility.
-- **Interactive Dashboards:** Tailored statistical overviews for every user role.
+- **Adaptive Theme:** Smooth transitions between Light and Dark modes with persistent user preference.
+- **Responsive Design:** Optimized for everything from mobile phones to large desktop monitors.
+- **Dashboard Analytics:** Tailored statistical overviews for every user role.
+- **Premium Aesthetics:** Modern typography, animated backgrounds, and intuitive navigation.
+
+---
+
+## 📖 How to Use Evently
+
+### 1. Getting Started
+- **Registration:** Click "Get Started" or "Register". Fill in your details.
+- **Account Activation:** After registering, check your inbox for an activation email. Click the link to verify your account. **Note:** You cannot login until your account is activated.
+- **Login:** Use your credentials to access your personalized dashboard.
+
+### 2. For Participants (Default Role)
+- **Discover Events:** Browse the "Events" page to find upcoming experiences.
+- **Search & Filter:** Use the search bar or category dropdown to narrow down your interests.
+- **Join Events:** Click on an event to view details and hit "Join Event" to participate.
+- **Track Activity:** Your dashboard shows how many events you've joined and provides quick access to them.
+
+### 3. For Organizers
+- **Create Events:** Use the "Add Event" button on your dashboard to submit a new event.
+- **Approval:** If the platform requires it, your event will be "Pending" until an admin approves it.
+- **Manage Events:** Track participation counts and update event details anytime through the "Manage My Events" section.
+
+### 4. For Administrators
+- **User Oversight:** View and manage all registered users from the "User Management" panel.
+- **Content Moderation:** Approve or reject submitted events to maintain platform quality.
+- **Categories:** Create and update event categories to keep the platform organized.
 
 ---
 
@@ -53,4 +78,4 @@
 
 ---
 
-Developed with ❤️ by **[MD. Likhon Sorkar](https://github.com/likhon)**
+Linkedin:  **[MD. Likhon Sorkar](https://github.com/likhon)**
