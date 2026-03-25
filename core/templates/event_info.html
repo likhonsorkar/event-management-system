@@ -1,87 +1,150 @@
-{% extends 'template.html' %}
+{% extends base_template|default:"template.html" %}
+{% block title %}{{ event.name }} - Evently{% endblock %}
 
-{% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="bg-white shadow-2xl rounded-lg overflow-hidden">
-        <div class="px-6 py-4 bg-gray-800 text-white">
-            <h1 class="text-4xl font-extrabold">{{ event.name }}</h1>
-            <p class="text-gray-300">{{ event.category.name }}</p>
-        </div>
-        <div class="p-6">
-            <p class="text-gray-700 text-lg mb-6">{{ event.description }}</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Details</h2>
-                    <div class="flex items-center mb-3">
-                        <span class="text-gray-600 font-semibold w-24">Date:</span>
-                        <span class="text-gray-800">{{ event.date }}</span>
-                    </div>
-                    <div class="flex items-center mb-3">
-                        <span class="text-gray-600 font-semibold w-24">Time:</span>
-                        <span class="text-gray-800">{{ event.time }}</span>
-                    </div>
-                    <div class="flex items-center mb-3">
-                        <span class="text-gray-600 font-semibold w-24">Location:</span>
-                        <span class="text-gray-800">{{ event.location }}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="text-gray-600 font-semibold w-24">Organizer:</span>
-                        <span class="text-gray-800">{{ event.organizer.username }}</span>
-                    </div>
+{% block dashboard_content %}
+<div class="max-w-5xl mx-auto space-y-12">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div class="space-y-4">
+            <div class="flex items-center space-x-4">
+                <span class="px-4 py-1.5 text-xs font-black bg-blue-600 text-white rounded-xl uppercase tracking-widest shadow-lg shadow-blue-500/20">
+                    {{ event.category.name }}
+                </span>
+                <span class="flex items-center text-sm font-bold text-slate-500 dark:text-zinc-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M16 11h.01M8 15h.01M16 15h.01M12 18h.01M3 9h18a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V11a2 2 0 012-2z"/></svg>
+                    {{ event.date|date:"F d, Y" }} at {{ event.time|time:"H:i" }}
+                </span>
+            </div>
+            <h1 class="text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                {{ event.name }}
+            </h1>
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-900 dark:text-white font-black text-sm">
+                    {{ event.organizer.username|first|upper }}
                 </div>
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Participants</h2>
-                    <p class="text-gray-700">{{ event.participants.count }} attending</p>
+                    <p class="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Organized by</p>
+                    <p class="text-sm font-black text-slate-700 dark:text-zinc-300">{{ event.organizer.username }}</p>
                 </div>
             </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4">
             {% if user.is_authenticated %}
-                {% if user in event.participants.all %}
-                    <a href="{% url 'leave_event' event.id %}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1">
-                        Leave Event
+                {% if user == event.organizer or user.is_staff or user.is_superuser %}
+                    <a href="{% url 'event_update' event.id %}" class="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl transition-all shadow-xl shadow-emerald-500/20 uppercase tracking-widest">
+                        Edit Event
+                    </a>
+                    <a href="{% url 'event_delete' event.id %}" class="px-8 py-4 bg-rose-600 hover:bg-rose-700 text-white font-black text-sm rounded-2xl transition-all shadow-xl shadow-rose-500/20 uppercase tracking-widest">
+                        Delete
                     </a>
                 {% else %}
-                    <a href="{% url 'join_event' event.id %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1">
-                        Join Event
-                    </a>
+                    {% if user in event.participants.all %}
+                        <a href="{% url 'leave_event' event.id %}" class="px-8 py-4 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 font-black text-sm rounded-2xl hover:bg-rose-200 transition-all uppercase tracking-widest">
+                            Leave Event
+                        </a>
+                    {% else %}
+                        <a href="{% url 'join_event' event.id %}" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm rounded-2xl transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest">
+                            Join Event Now
+                        </a>
+                    {% endif %}
                 {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm rounded-2xl transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest">
+                    Login to Join
+                </a>
             {% endif %}
         </div>
     </div>
 
-    {% if can_view_participants %}
-    <div class="mt-10">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Participants List</h2>
-        {% if event.participants.all %}
-            <div class="bg-white shadow-lg rounded-lg overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Username
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Email
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% for participant in event.participants.all %}
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ participant.username }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ participant.email }}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <!-- Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <!-- Main Info -->
+        <div class="lg:col-span-2 space-y-12">
+            <div class="prose prose-slate dark:prose-invert max-w-none">
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-6 uppercase tracking-tight">About this event</h3>
+                <p class="text-slate-600 dark:text-zinc-400 leading-relaxed text-lg">
+                    {{ event.description|linebreaks }}
+                </p>
             </div>
-        {% else %}
-            <p class="text-gray-500">No participants for this event yet.</p>
-        {% endif %}
+
+            {% if can_view_participants %}
+            <div class="space-y-8">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Participants</h3>
+                    <span class="px-4 py-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 rounded-xl font-bold text-sm">
+                        {{ event.participants.count }} total
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% for participant in event.participants.all %}
+                    <div class="flex items-center space-x-4 p-4 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-black">
+                            {{ participant.username|first|upper }}
+                        </div>
+                        <div>
+                            <p class="font-black text-slate-900 dark:text-white">{{ participant.username }}</p>
+                            <p class="text-xs text-slate-500 dark:text-zinc-500">{{ participant.email }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-span-full py-12 text-center bg-slate-50 dark:bg-zinc-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-zinc-800">
+                        <p class="text-slate-500 dark:text-zinc-500 font-bold">No participants yet.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar Details -->
+        <div class="space-y-8">
+            <div class="p-8 bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none space-y-8">
+                <div>
+                    <h4 class="text-xs font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-4">Location</h4>
+                    <div class="flex items-start space-x-4">
+                        <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-600 dark:text-blue-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <p class="text-slate-700 dark:text-zinc-300 font-bold leading-relaxed">
+                            {{ event.location }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pt-8 border-t border-slate-50 dark:border-zinc-800">
+                    <h4 class="text-xs font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-4">Date & Time</h4>
+                    <div class="flex items-start space-x-4">
+                        <div class="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl text-indigo-600 dark:text-indigo-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div class="text-slate-700 dark:text-zinc-300 font-bold">
+                            <p>{{ event.date|date:"l, F d" }}</p>
+                            <p class="text-slate-500 dark:text-zinc-500">{{ event.time|time:"H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-8 border-t border-slate-50 dark:border-zinc-800">
+                    <h4 class="text-xs font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-4">Stats</h4>
+                    <div class="flex items-center space-x-4">
+                        <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-amber-600 dark:text-amber-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2c-.722-.524-1.488-.934-2.288-1.214M17 20h-2m2 0h2"/></svg>
+                        </div>
+                        <p class="text-slate-700 dark:text-zinc-300 font-bold">
+                            {{ event.participants.count }} joined so far
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share Button (Visual Only) -->
+            <button class="w-full py-5 border-2 border-slate-200 dark:border-zinc-800 rounded-[2rem] text-slate-600 dark:text-zinc-400 font-black text-sm uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-zinc-900 transition-all flex items-center justify-center space-x-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 100-2.684 3 3 0 000 2.684zm0 9.316a3 3 0 100-2.684 3 3 0 000 2.684z"/></svg>
+                <span>Share Event</span>
+            </button>
+        </div>
     </div>
-    {% endif %}
 </div>
 {% endblock %}

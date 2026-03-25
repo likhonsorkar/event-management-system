@@ -11,7 +11,7 @@ class StyleMixin:
         super().__init__(*arg, **kwarg)
         self.apply_styled_widgets()
 
-    default_classes = "border-2 border-gray-300 w-full p-3 rounded-lg shadow-sm focus:outline-none focus:border-rose-500 focus:ring-rose-500"
+    default_classes = "w-full px-4 py-3 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
 
     def apply_styled_widgets(self):
         for field_name, field in self.fields.items():
@@ -20,24 +20,30 @@ class StyleMixin:
                     'class': self.default_classes,
                     'placeholder': f"Enter {field.label.lower()}"
                 })
+            elif isinstance(field.widget, forms.EmailInput):
+                field.widget.attrs.update({
+                    'class': self.default_classes,
+                    'placeholder': f"Enter {field.label.lower()}"
+                })
+            elif isinstance(field.widget, (forms.PasswordInput, forms.DateInput, forms.TimeInput, forms.NumberInput)):
+                field.widget.attrs.update({
+                    'class': self.default_classes,
+                })
             elif isinstance(field.widget, forms.Textarea):
                 field.widget.attrs.update({
                     'class': f"{self.default_classes} resize-none",
                     'placeholder':  f"Enter {field.label.lower()}",
-                    'rows': 5
+                    'rows': 4
                 })
-            elif isinstance(field.widget, forms.SelectDateWidget):
-                print("Inside Date")
+            elif isinstance(field.widget, (forms.Select, forms.SelectDateWidget)):
                 field.widget.attrs.update({
-                    "class": "border-2 border-gray-300 p-3 rounded-lg shadow-sm focus:outline-none focus:border-rose-500 focus:ring-rose-500"
+                    'class': self.default_classes
                 })
             elif isinstance(field.widget, forms.CheckboxSelectMultiple):
-                print("Inside checkbox")
                 field.widget.attrs.update({
                     'class': "space-y-2"
                 })
             else:
-                print("Inside else")
                 field.widget.attrs.update({
                     'class': self.default_classes
                 })

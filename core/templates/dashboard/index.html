@@ -1,0 +1,204 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Dashboard Overview - Evently{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-8 animate-in fade-in duration-500">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <!-- Total Events -->
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-slate-100 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M16 11h.01M8 15h.01M16 15h.01M12 18h.01M3 9h18a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V11a2 2 0 012-2z"/></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Total Events</p>
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white">{{ total_events|default:"0" }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users/Participants -->
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-slate-100 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-1">{% if user.is_staff %}Total Users{% else %}Participating{% endif %}</p>
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white">{{ total_users|default:"0" }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-slate-100 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Categories</p>
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white">{{ total_categories|default:"0" }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming / Pending -->
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-slate-100 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 {% if user.is_staff and pending_approvals > 0 %}bg-rose-500/10 text-rose-600{% else %}bg-rose-500/10 text-rose-600{% endif %} rounded-2xl flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-1">{% if user.is_staff %}Pending Approval{% else %}Upcoming{% endif %}</p>
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white">{% if user.is_staff %}{{ pending_approvals|default:"0" }}{% else %}{{ upcoming_events|default:"0" }}{% endif %}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin: Pending Approvals Section -->
+    {% if user.is_staff or user.is_superuser %}
+    {% if pending_events %}
+    <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border-2 border-rose-100 dark:border-rose-900/20 overflow-hidden shadow-xl shadow-rose-500/5">
+        <div class="p-8 border-b border-rose-50 dark:border-rose-900/10 flex items-center justify-between bg-rose-50/30 dark:bg-rose-900/5">
+            <div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Pending Approvals</h3>
+                <p class="text-xs text-rose-500 mt-1 font-bold uppercase tracking-wider">Events requiring review</p>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <tbody class="divide-y divide-rose-50 dark:divide-rose-900/10">
+                    {% for event in pending_events %}
+                    <tr class="hover:bg-rose-50/20 dark:hover:bg-rose-900/5 transition-colors group">
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-rose-600/10 rounded-xl flex items-center justify-center text-rose-600 font-black text-xs">
+                                    {{ event.name|first|upper }}
+                                </div>
+                                <div>
+                                    <span class="font-bold text-slate-900 dark:text-white block">{{ event.name }}</span>
+                                    <span class="text-[10px] text-slate-400 font-medium">By {{ event.organizer.username }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <span class="text-sm text-slate-500 dark:text-zinc-500 font-medium">{{ event.date|date:"M d, Y" }}</span>
+                        </td>
+                        <td class="px-8 py-6 text-right">
+                            <div class="flex items-center justify-end gap-3">
+                                <a href="{% url 'event_detail' event.id %}" class="px-4 py-2 text-slate-500 hover:text-slate-900 dark:hover:text-white text-[10px] font-black uppercase tracking-widest transition-colors">Review</a>
+                                <a href="{% url 'approve_event' event.id %}" class="px-5 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-500/20 transition-all">Approve Now</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Recent Events Section -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-slate-100 dark:border-zinc-800 overflow-hidden shadow-sm">
+                <div class="p-8 border-b border-slate-50 dark:border-zinc-800/50 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Recent Events</h3>
+                        <p class="text-xs text-slate-400 mt-1 font-medium">Latest updates from your timeline</p>
+                    </div>
+                    <a href="{% url 'manage_events' %}" class="px-5 py-2 bg-slate-50 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 hover:text-white transition-all">View All</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50/50 dark:bg-zinc-800/30 text-slate-400 dark:text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                            <tr>
+                                <th class="px-8 py-5">Event</th>
+                                <th class="px-8 py-5">Date</th>
+                                <th class="px-8 py-5">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50 dark:divide-zinc-800/50">
+                            {% for event in recent_events %}
+                            <tr class="hover:bg-slate-50/50 dark:hover:bg-zinc-800/20 transition-colors group">
+                                <td class="px-8 py-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-600 font-black text-xs group-hover:scale-110 transition-transform">
+                                            {{ event.name|first|upper }}
+                                        </div>
+                                        <span class="font-bold text-slate-900 dark:text-white tracking-tight">{{ event.name }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <span class="text-sm text-slate-500 dark:text-zinc-500 font-medium">{{ event.date|date:"M d, Y" }}</span>
+                                </td>
+                                <td class="px-8 py-6">
+                                    {% if event.is_approved %}
+                                    <span class="inline-flex items-center px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">Approved</span>
+                                    {% else %}
+                                    <span class="inline-flex items-center px-3 py-1 bg-amber-500/10 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-500/20">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="px-8 py-20 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-16 h-16 bg-slate-50 dark:bg-zinc-800 rounded-full flex items-center justify-center text-slate-300 dark:text-zinc-700 mb-4">
+                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M16 11h.01M8 15h.01M16 15h.01M12 18h.01M3 9h18a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V11a2 2 0 012-2z"/></svg>
+                                        </div>
+                                        <p class="text-slate-500 dark:text-zinc-500 font-bold">No events found yet</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Section -->
+        <div class="space-y-8">
+            <!-- Profile Card -->
+            <div class="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-slate-100 dark:border-zinc-800 p-8 shadow-sm relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-blue-600/10 transition-colors"></div>
+                
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight">Quick Profile</h3>
+                
+                <div class="flex flex-col items-center text-center space-y-4 mb-8">
+                    <div class="relative">
+                        <div class="w-24 h-24 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[2rem] flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-blue-500/20 transform group-hover:rotate-6 transition-transform">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 border-4 border-white dark:border-zinc-900 rounded-full"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-black text-slate-900 dark:text-white uppercase tracking-tight text-lg">{{ user.username }}</h4>
+                        <p class="text-sm text-slate-500 dark:text-zinc-500 font-medium">{{ user.email }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="p-4 bg-slate-50 dark:bg-zinc-800/50 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Role</p>
+                        <p class="font-black text-blue-600 text-xs">{% if user.is_superuser %}Admin{% elif user.is_staff %}Staff{% else %}Member{% endif %}</p>
+                    </div>
+                    <div class="p-4 bg-slate-50 dark:bg-zinc-800/50 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Joined</p>
+                        <p class="font-black text-slate-900 dark:text-white text-xs">{{ user.date_joined|date:"M Y" }}</p>
+                    </div>
+                </div>
+
+                <a href="{% url 'profile' %}" class="block w-full text-center py-4 bg-slate-900 dark:bg-blue-600 text-white font-black tracking-tight rounded-2xl hover:opacity-90 transition-all uppercase text-xs shadow-xl shadow-slate-900/10 dark:shadow-blue-900/20">Edit Profile Settings</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

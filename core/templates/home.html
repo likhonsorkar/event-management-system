@@ -1,75 +1,239 @@
 {% extends "template.html" %}
-{% block title %}Home{% endblock %}
-{% block content %}
-<main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-    {% if messages %}
-    <div class="space-y-2 mb-6">
-        {% for message in messages %}
-        <div class="p-4 rounded-lg
-                {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
-            {{ message }}
-        </div>
-        {% endfor %}
+{% load static %}
+{% block title %}Evently - Extraordinary Events Simplified{% endblock %}
+
+{% block hero %}
+<section class="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-slate-50 dark:bg-zinc-950 transition-colors duration-700">
+    <!-- Dynamic Background Elements -->
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <!-- Primary Glow -->
+        <div class="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-blue-600/10 dark:bg-blue-600/20 blur-[120px] rounded-full animate-pulse"></div>
+        <!-- Secondary Glow -->
+        <div class="absolute -bottom-[20%] -right-[10%] w-[70%] h-[70%] bg-indigo-600/10 dark:bg-indigo-600/20 blur-[120px] rounded-full animate-pulse" style="animation-delay: 2s;"></div>
+        
+        <!-- Animated Floating Shapes (Light Mode specific accent) -->
+        <div class="absolute top-1/4 right-[10%] w-64 h-64 bg-purple-500/5 dark:bg-transparent blur-3xl rounded-full animate-bounce" style="animation-duration: 10s;"></div>
+        <div class="absolute bottom-1/4 left-[5%] w-48 h-48 bg-emerald-500/5 dark:bg-transparent blur-3xl rounded-full animate-bounce" style="animation-duration: 15s; animation-delay: 1s;"></div>
     </div>
-    {% endif %}
-    <section class="mb-16">
-        <div class="flex flex-col sm:flex-row items-center justify-between mb-8">
-            <h2 class="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent text-center sm:text-left mb-4 sm:mb-0">
-                Events
-            </h2>
-            {% if user.is_authenticated %}
-            <a href="{% url 'event_create' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
-                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                </svg> Create Event
-            </a>
-            {% else %}
-            <a href="{% url 'login' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
-                Join Now
-            </a>
-            {% endif %}
+
+    <div class="container mx-auto px-6 relative z-10">
+        <div class="max-w-4xl mx-auto text-center space-y-8">
+            <div class="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white dark:bg-blue-500/10 border border-slate-200 dark:border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-[0.2em] shadow-sm">
+                <span class="relative flex h-2 w-2 mr-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                The Next Generation of Event Management
+            </div>
+            
+            <h1 class="text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter leading-[1.1]">
+                Extraordinary Events <br>
+                <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">Made Simple.</span>
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed font-medium">
+                Discover local experiences or host your own global event. Evently provides the tools you need to grow your community and create lasting memories.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-5 pt-8">
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="w-full sm:w-auto px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-2xl shadow-blue-500/25 flex items-center justify-center group uppercase text-sm tracking-widest">
+                        Create Your Event
+                        <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </a>
+                    <a href="{% url 'eventlist' %}" class="w-full sm:w-auto px-10 py-5 bg-white dark:bg-zinc-900/50 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-900 dark:text-white font-black rounded-2xl transition-all border border-slate-200 dark:border-zinc-800 backdrop-blur-md uppercase text-sm tracking-widest">
+                        Explore Events
+                    </a>
+                {% else %}
+                    <a href="{% url 'event_create' %}" class="w-full sm:w-auto px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-2xl shadow-blue-500/25 flex items-center justify-center uppercase text-sm tracking-widest">
+                        Start Hosting Event
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="w-full sm:w-auto px-10 py-5 bg-white dark:bg-zinc-900/50 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-900 dark:text-white font-black rounded-2xl transition-all border border-slate-200 dark:border-zinc-800 uppercase text-sm tracking-widest">
+                        View Dashboard
+                    </a>
+                {% endif %}
+            </div>
+            
+            <div class="pt-20 grid grid-cols-2 md:grid-cols-4 gap-12 max-w-3xl mx-auto border-t border-slate-200 dark:border-zinc-800/50">
+                <div>
+                    <p class="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{{ total_events }}</p>
+                    <p class="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-black tracking-[0.2em] mt-2">Events Hosted</p>
+                </div>
+                <div>
+                    <p class="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{{ total_users }}</p>
+                    <p class="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-black tracking-[0.2em] mt-2">Active Users</p>
+                </div>
+                <div>
+                    <p class="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{{ total_locations }}</p>
+                    <p class="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-black tracking-[0.2em] mt-2">Locations</p>
+                </div>
+                <div>
+                    <p class="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{{ total_categories }}</p>
+                    <p class="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-black tracking-[0.2em] mt-2">Categories</p>
+                </div>
+            </div>
         </div>
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {% for event in events %}
-            <div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden border border-gray-200">
-                <div class="p-6">
-                    <div class="flex items-start justify-between">
-                        <h3 class="text-xl font-semibold text-gray-900 leading-snug">{{ event.name }}</h3>
-                        <span class="ml-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium uppercase tracking-wide">
-                            {{ event.category.name }}
-                        </span>
-                    </div>
-                    <p class="mt-3 text-sm text-gray-600 line-clamp-3">{{ event.description|truncatechars:80 }}</p>
-                    <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                        <div class="flex items-center space-x-4">
-                            <div class="flex items-center">
-                                <svg class="h-4 w-4 mr-1 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2c-.722-.524-1.488-.934-2.288-1.214M17 20h-2m2 0h2" />
-                                </svg>
-                                <span>{{ event.participants.count }}</span>
-                            </div>
-                            <div class="flex items-center">
-                                <svg class="h-4 w-4 mr-1 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M16 11h.01M8 15h.01M16 15h.01M12 18h.01M3 9h18a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V11a2 2 0 012-2z" />
-                                </svg>
-                                <span class="font-medium">{{ event.date }}</span>
-                            </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-32 py-12">
+    <!-- Features Section -->
+    <section>
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <h2 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Why Evently?</h2>
+            <h3 class="text-4xl font-bold text-gray-900 dark:text-white tracking-tight">Everything you need to <span class="italic font-serif">thrive.</span></h3>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="p-8 bg-white dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-800 rounded-3xl hover:shadow-2xl transition-all group">
+                <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6 group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                </div>
+                <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Powerful Controls</h4>
+                <p class="text-gray-600 dark:text-zinc-400 leading-relaxed">Manage registrations, event types, and analytics from a single intuitive dashboard built for scale.</p>
+            </div>
+
+            <div class="p-8 bg-white dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-800 rounded-3xl hover:shadow-2xl transition-all group">
+                <div class="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-6 group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Instant Insights</h4>
+                <p class="text-gray-600 dark:text-zinc-400 leading-relaxed">Understand your audience with real-time tracking of attendance and engagement metrics for every event.</p>
+            </div>
+
+            <div class="p-8 bg-white dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-800 rounded-3xl hover:shadow-2xl transition-all group">
+                <div class="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2c-.722-.524-1.488-.934-2.288-1.214M17 20h-2m2 0h2"/></svg>
+                </div>
+                <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Community First</h4>
+                <p class="text-gray-600 dark:text-zinc-400 leading-relaxed">Built-in tools to communicate with your attendees and grow your loyal following through meaningful interactions.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section class="bg-gray-100 dark:bg-zinc-800/30 rounded-[3rem] p-12 md:p-20 border border-gray-200 dark:border-zinc-800">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div class="space-y-8">
+                <h3 class="text-4xl font-bold text-gray-900 dark:text-white tracking-tight">From idea to execution in <span class="text-blue-600 underline decoration-blue-500/30">minutes.</span></h3>
+                
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-6">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex-shrink-0 flex items-center justify-center font-bold">1</div>
+                        <div>
+                            <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Create Your Profile</h5>
+                            <p class="text-gray-500 dark:text-zinc-400">Sign up and set up your organizer profile to build trust with your audience.</p>
                         </div>
                     </div>
-                    <div class="mt-4">
-                        <p class="text-pink-400 font-semibold text-sm mb-2" id="countdown-{{ event.id }}"></p>
+                    <div class="flex items-start space-x-6">
+                        <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex-shrink-0 flex items-center justify-center font-bold">2</div>
+                        <div>
+                            <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Launch Your Event</h5>
+                            <p class="text-gray-500 dark:text-zinc-400">Fill in details, upload imagery, and set up your categories in under 5 minutes.</p>
+                        </div>
                     </div>
-                    <a href="{% url 'event_detail' event.id %}" class="block w-full text-center py-2 px-4 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition">
-                        View Details
+                    <div class="flex items-start space-x-6">
+                        <div class="w-10 h-10 rounded-full bg-purple-600 text-white flex-shrink-0 flex items-center justify-center font-bold">3</div>
+                        <div>
+                            <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Engage & Grow</h5>
+                            <p class="text-gray-500 dark:text-zinc-400">Watch the registrations roll in and manage your community with ease.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pt-6">
+                    <a href="{% url 'register' %}" class="inline-flex items-center text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                        Start your first event today
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </a>
                 </div>
             </div>
+            <div class="relative">
+                <div class="aspect-square bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-3xl flex items-center justify-center overflow-hidden">
+                    <img src="{% static 'images/hero-image.webp' %}" alt="App preview" class="w-[85%] rounded-2xl shadow-2xl rotate-3">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Events Section -->
+    <section>
+        <div class="flex items-center justify-between mb-12">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Upcoming Experiences</h2>
+                <p class="text-gray-500 dark:text-zinc-400 mt-2 text-lg italic">Curated events just for you.</p>
+            </div>
+            <a href="{% url 'eventlist' %}" class="hidden sm:flex items-center px-6 py-3 bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all">
+                Browse All
+            </a>
+        </div>
+
+        <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+            {% for event in events %}
+            <div class="group relative bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-[2rem] overflow-hidden hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-500 flex flex-col h-full">
+                <div class="relative h-48 overflow-hidden">
+                    <div class="absolute inset-0 bg-blue-600 group-hover:scale-110 transition-transform duration-700 flex items-center justify-center text-white text-4xl font-black italic opacity-20">
+                        {{ event.name|first }}
+                    </div>
+                    <div class="absolute top-4 left-4">
+                        <span class="px-4 py-1.5 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 shadow-sm border border-white/20">
+                            {{ event.category.name }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="p-8 flex-1 flex flex-col">
+                    <div class="flex items-center text-xs font-bold text-gray-400 dark:text-zinc-500 mb-3 space-x-3 uppercase tracking-widest">
+                        <span>{{ event.date|date:"M d" }}</span>
+                        <span class="w-1 h-1 bg-gray-300 dark:bg-zinc-700 rounded-full"></span>
+                        <span>{{ event.location }}</span>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 leading-tight group-hover:text-blue-600 transition-colors">
+                        {{ event.name }}
+                    </h3>
+                    
+                    <p class="text-gray-500 dark:text-zinc-400 text-sm line-clamp-3 mb-8 flex-1">
+                        {{ event.description }}
+                    </p>
+                    
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-50 dark:border-zinc-800/50">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 bg-blue-600 flex items-center justify-center text-[10px] text-white font-bold">+</div>
+                            <div class="w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 bg-gray-200 dark:bg-zinc-800 flex items-center justify-center text-[10px] text-gray-500 font-bold">{{ event.participants.count }}</div>
+                        </div>
+                        <a href="{% url 'event_detail' event.id %}" class="px-6 py-2 text-sm font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all">
+                            Details
+                        </a>
+                    </div>
+                </div>
+            </div>
             {% empty %}
-            <div class="lg:col-span-3 text-center py-10">
-                <p class="text-xl text-gray-500 italic">No upcoming events found. Be the first to add one!</p>
+            <div class="col-span-full py-32 text-center bg-gray-50 dark:bg-zinc-900/50 rounded-[3rem] border-2 border-dashed border-gray-200 dark:border-zinc-800">
+                <div class="w-20 h-20 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M16 11h.01M8 15h.01M16 15h.01M12 18h.01M3 9h18a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V11a2 2 0 012-2z"/></svg>
+                </div>
+                <h4 class="text-xl font-bold text-gray-900 dark:text-white">No upcoming events</h4>
+                <p class="text-gray-500 dark:text-zinc-500 mt-2">Check back later or start your own journey.</p>
             </div>
             {% endfor %}
         </div>
     </section>
-</main>
+
+    <!-- Final CTA -->
+    <section class="relative bg-blue-600 rounded-[3rem] p-12 md:p-24 overflow-hidden text-center shadow-2xl shadow-blue-500/40">
+        <div class="absolute inset-0 opacity-10">
+            <img src="{% static 'images/hero-image.webp' %}" alt="" class="w-full h-full object-cover">
+        </div>
+        <div class="relative z-10 max-w-3xl mx-auto space-y-8">
+            <h2 class="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">Ready to create something <br> extraordinary?</h2>
+            <p class="text-blue-100 text-lg md:text-xl font-medium">Join thousands of organizers who trust Evently to host their most important moments.</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <a href="{% url 'register' %}" class="w-full sm:w-auto px-10 py-5 bg-white text-blue-600 font-bold rounded-2xl hover:bg-blue-50 transition-all shadow-xl">Get Started Now</a>
+            </div>
+        </div>
+    </section>
+</div>
 {% endblock %}

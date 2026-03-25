@@ -6,7 +6,7 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=20, blank=True, null=True)
     profile_picture = models.ImageField(
         upload_to="profile/",
-        default='default/user.png'
+        default='profile/user.png'
     )
 
     def __str__(self):
@@ -27,6 +27,7 @@ class Events(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="events")
     organizer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="organized_events")
     participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="participated_events", blank=True)
+    is_approved = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} at {self.location} on {self.date}"

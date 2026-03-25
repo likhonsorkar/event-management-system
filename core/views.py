@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic import TemplateView, UpdateView, CreateView, ListView, DetailView, DeleteView
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
@@ -13,42 +13,55 @@ from .forms import RegistrationFrom, LoginForm, CategoryForm, EventsForm, Profil
 from core.models import Events, Category, CustomUser
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 User = get_user_model()
+
 def is_admin(user):
-    return user.groups.filter(name='admin').exists()
+    return user.is_superuser or user.groups.filter(name='admin').exists()
+
 def is_organizer(user):
     return user.groups.filter(name='organizer').exists()
-def is_participent(user):
-    return user.groups.filter(name='participent').exists()
+
+def is_participant(user):
+    return user.groups.filter(name='participant').exists()
+
+def is_admin_or_organizer(user):
+    return is_admin(user) or is_organizer(user)
+
 def get_user_role(user):
-    if user.groups.filter(name='admin').exists():
+    if is_admin(user):
         return 'admin'
-    elif user.groups.filter(name='organizer').exists():
+    elif is_organizer(user):
         return 'organizer'
-    elif user.groups.filter(name='participant').exists():
+    elif is_participant(user):
         return 'participant'
     return None
+
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+
 def register(request):
     if request.method == 'POST':
         form = RegistrationFrom(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
-            user.is_active = False
-            form.save()
-            participant_group, created = Group.objects.get_or_create(name='participant')
-            user.groups.add(participant_group)
-            messages.success(request, 'Registration successful. You can\'t now log in. Please check your email and active your accout to login')
+            user.save()
+            
+            messages.success(request, 'Registration successful. Please check your email to activate your account.')
             return redirect('login')
     else:
         form = RegistrationFrom()
     return render(request, 'registration.html', {'form': form})
-def active_account(request, user_id, token):
+
+def active_account(request, uidb64, token):
     try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        messages.error(request, "Invalid activation link.")
-        return redirect('login')  # redirect to login or error page
-    if default_token_generator.check_token(user, token):
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
         messages.success(request, "Your account has been activated successfully. You can now log in.")
@@ -56,6 +69,7 @@ def active_account(request, user_id, token):
     else:
         messages.error(request, "Activation link is invalid or has expired.")
         return redirect('login')
+
 def user_login(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -69,131 +83,189 @@ def user_login(request):
                 login(request, user)
                 return redirect('dashboard')
             else:
-                messages.error(request, 'Invalid username or password.')
+                # Check if user exists but is inactive
+                user_model = get_user_model()
+                try:
+                    target_user = user_model.objects.get(username=username)
+                    if not target_user.is_active:
+                        messages.error(request, 'Your account is not active. Please check your email for the activation link.')
+                    else:
+                        messages.error(request, 'Invalid username or password.')
+                except user_model.DoesNotExist:
+                    messages.error(request, 'Invalid username or password.')
         else:
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
+
+from django.utils import timezone
+
 @login_required
-def role_dash(request):
-    role = get_user_role(request.user)
-    if role is None and request.user.is_staff:
-        return redirect('/superadmin/')
-    if role == 'admin':
-        return redirect('admin_dashboard')
-    elif role == 'organizer':
-        return redirect('organizer_dashboard')
-    elif role == 'participant':
-        return redirect('participant_dashboard')
-    else:
-        return redirect('login')
+@user_passes_test(is_admin)
+def approve_event(request, event_id):
+    event = get_object_or_404(Events, id=event_id)
+    event.is_approved = True
+    event.save()
+    messages.success(request, f'Event "{event.name}" has been approved.')
+    return redirect('dashboard')
+
 @login_required
 def admin_dashboard(request):
-    user_count = User.objects.count()
-    event_count = Events.objects.count()
-    category_count = Category.objects.count()
+    if not is_admin(request.user):
+        return redirect('dashboard')
+        
     context = {
-        'user_count': user_count,
-        'event_count': event_count,
-        'category_count': category_count,
+        'total_users': User.objects.count(),
+        'total_events': Events.objects.count(),
+        'total_categories': Category.objects.count(),
+        'upcoming_events': Events.objects.filter(date__gte=timezone.now(), is_approved=True).count(),
+        'pending_approvals': Events.objects.filter(is_approved=False).count(),
+        'recent_events': Events.objects.all().order_by('-id')[:5],
+        'pending_events': Events.objects.filter(is_approved=False).order_by('-id'),
+        'title': 'Admin Overview'
     }
-    return render(request, 'dashboard/admindashboard.html', context)
+    return render(request, 'dashboard/index.html', context)
+
 @login_required
-def organizer_dashboard(request):
-    events = Events.objects.filter(organizer=request.user)
-    context = {
-        'events': events,
-    }
-    return render(request, 'dashboard/organizer_dashboard.html', context)
-@login_required
-def participant_dashboard(request):
-    events = Events.objects.filter(participants=request.user)
-    context = {
-        'events': events,
-    }
-    return render(request, 'dashboard/participant_dashboard.html', context)
+def dashboard_view(request):
+    if is_admin(request.user):
+        return admin_dashboard(request)
+        
+    role = get_user_role(request.user)
+    
+    if role == 'organizer':
+        events = Events.objects.filter(organizer=request.user)
+        context = {
+            'total_events': events.count(),
+            'total_users': sum(e.participants.count() for e in events),
+            'total_categories': events.values('category').distinct().count(),
+            'upcoming_events': events.filter(date__gte=timezone.now(), is_approved=True).count(),
+            'recent_events': events.order_by('-id')[:5],
+            'title': 'Organizer Overview'
+        }
+    else: # participant or default
+        events = Events.objects.filter(participants=request.user)
+        context = {
+            'total_events': events.count(),
+            'total_users': 0,
+            'total_categories': events.values('category').distinct().count(),
+            'upcoming_events': events.filter(date__gte=timezone.now(), is_approved=True).count(),
+            'recent_events': events.order_by('-id')[:5],
+            'title': 'Member Overview'
+        }
+        
+    return render(request, 'dashboard/index.html', context)
+
 def user_logout(request):
     logout(request)
     return redirect('login')
+
 def event_home(request):
-    latest_events = Events.objects.order_by('-date')[:3]
-    return render(request, "home.html", {"events": latest_events})
+    latest_events = Events.objects.filter(is_approved=True).order_by('-date')[:3]
+    total_events = Events.objects.filter(is_approved=True).count()
+    total_users = CustomUser.objects.count()
+    total_categories = Category.objects.count()
+    # For countries, we'll use a unique count of locations if it's formatted as 'City, Country' 
+    # but since it's a simple CharField, we can just show a meaningful static-ish or count unique locations.
+    total_locations = Events.objects.values('location').distinct().count()
+    
+    context = {
+        "events": latest_events,
+        "total_events": total_events,
+        "total_users": total_users,
+        "total_categories": total_categories,
+        "total_locations": total_locations,
+    }
+    return render(request, "home.html", context)
 
 @login_required
 def join_event(request, event_id):
-    event = Events.objects.get(id=event_id)
-    if request.user in event.participants.all():
+    event = get_object_or_404(Events, id=event_id)
+    if request.user == event.organizer:
+        messages.error(request, "You cannot join your own event.")
+    elif request.user in event.participants.all():
         messages.warning(request, "You are already participating in this event.")
     else:
         event.participants.add(request.user)
         messages.success(request, "You have successfully joined the event.")
     return redirect('event_detail', id=event_id)
+
 @login_required
 def leave_event(request, event_id):
-    event = Events.objects.get(id=event_id)
+    event = get_object_or_404(Events, id=event_id)
     if request.user in event.participants.all():
         event.participants.remove(request.user)
         messages.success(request, "You have successfully left the event.")
     else:
         messages.warning(request, "You are not participating in this event.")
     return redirect('event_detail', id=event_id)
-def is_admin_or_organizer(user):
-    return user.groups.filter(name__in=['admin', 'organizer']).exists()
-# @login_required
-# @user_passes_test(is_admin_or_organizer)
-# def event_create(request):
-#     form = EventsForm(request.POST)
-#     if form.is_valid():
-#         event = form.save(commit=False)
-#         event.organizer = request.user
-#         event.save()
-#         messages.success(request, "Event Create Succesfull")
-#         return redirect("eventlist")
-#     return render(request, "form.html", {"form": form, "title": "Create Event"})
-#class based views event create
+
 class EventCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView ):
-    permission_denied_message = "You don't have permission to update or create event"
+    permission_denied_message = "Only organizers and admins can create events."
     model = Events
     form_class = EventsForm
     template_name = "form.html"
-    success_url = "/eventlist/"
+    success_url = reverse_lazy("manage_events")
     def test_func(self):
        return is_admin_or_organizer(self.request.user)
     def form_valid(self, form):
         event = form.save(commit=False)
         event.organizer = self.request.user
+        if not is_admin(self.request.user):
+            event.is_approved = False 
+        else:
+            event.is_approved = True 
         event.save()
-        messages.success(self.request, "Event Create Succesfull")
+        messages.success(self.request, "Event Create Successful" if event.is_approved else "Event created successfully and is pending approval.")
         return super().form_valid(form)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Create Event"
+        context["base_template"] = "dashboard/base.html" if self.request.user.is_authenticated else "template.html"
         return context
 
-# def event_read(request, id=None):
-#     event = Events.objects.select_related("category").prefetch_related("participants").all()
-#     return render(request, "event_read.html", {'events':event})
-
-#Event Read Class Based view
 class EventRead(ListView):
     model = Events
     template_name = "event_read.html"
     context_object_name = 'events'
+
     def get_queryset(self):
-        return Events.objects.select_related("category").prefetch_related("participants").all()
+        queryset = Events.objects.filter(is_approved=True).select_related("category").prefetch_related("participants")
+        
+        search_query = self.request.GET.get('search')
+        category_id = self.request.GET.get('category')
+
+        if search_query:
+            queryset = queryset.filter(name__icontains=search_query)
+        
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+            
+        return queryset.order_by('-date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories"] = Category.objects.all()
+        context["base_template"] = "dashboard/base.html" if self.request.user.is_authenticated else "template.html"
+        return context
+
+class ManageEvents(LoginRequiredMixin, ListView):
+    model = Events
+    template_name = "dashboard/event_list.html"
+    context_object_name = 'events'
     
-# def event_detail(request, id=None):
-#     if id:
-#         event = Events.objects.get(id=id)
-#         can_view_participants = is_admin(request.user) or (request.user == event.organizer)
-#         context = {
-#             'event': event,
-#             'can_view_participants': can_view_participants
-#         }
-#         return render(request, "event_info.html", context)
-#     event = Events.objects.select_related("category").prefetch_related("participants").all()
-#     return render(request, "event_read.html", {'events':event})
+    def get_queryset(self):
+        user = self.request.user
+        if is_admin(user):
+            return Events.objects.select_related("category").prefetch_related("participants").all()
+        return Events.objects.filter(organizer=user).select_related("category").prefetch_related("participants")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["base_template"] = "dashboard/base.html"
+        return context
+    
 class Event_detail(DetailView):
     model = Events
     pk_url_kwarg = 'id'
@@ -203,26 +275,9 @@ class Event_detail(DetailView):
         context = super().get_context_data(**kwargs)
         event = self.get_object()
         context['can_view_participants'] = is_admin(self.request.user) or (self.request.user == event.organizer)
+        context["base_template"] = "template.html"
         return context
 
-# @login_required
-# def event_update(request, id):
-#     event = Events.objects.get(id=id)
-#     if not (request.user == event.organizer or is_admin(request.user)):
-#         messages.error(request, "You are not authorized to update this event.")
-#         return redirect('eventlist')
-#     if request.method == "POST":
-#         form = EventsForm(request.POST, instance=event)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Event Update Succesfull")
-#             return redirect("eventlist")
-#         else:
-#             messages.error(request, "Event update faild")
-#     else:
-#         form = EventsForm(instance=event)
-#     return render(request, "form.html", {"form": form, "title": "Update Event"})
-## Class Based Event Update
 class Event_update(LoginRequiredMixin,UserPassesTestMixin, UpdateView):
     permission_denied_message = "You are not authorized to update this event."
     model = Events
@@ -232,88 +287,79 @@ class Event_update(LoginRequiredMixin,UserPassesTestMixin, UpdateView):
     template_name = "form.html"
     def test_func(self):
        event = self.get_object()
-       return self.request.user == event.organizer or self.request.user.is_superuser
+       return is_admin(self.request.user) or self.request.user == event.organizer
     def handle_no_permission(self):
         messages.error(self.request, self.permission_denied_message)
-        return redirect('eventlist')
+        return redirect('manage_events')
     def get_success_url(self):
-        messages.success(self.request, "Event Update Succesfull")
-        return reverse_lazy('eventlist')
+        messages.success(self.request, "Event Update Successful")
+        return reverse_lazy('manage_events')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Update Event"
+        context["base_template"] = "dashboard/base.html" if self.request.user.is_authenticated else "template.html"
         return context
-# @login_required
-# def event_delete(request, id):
-#     event = Events.objects.get(id=id)
-#     if not (request.user == event.organizer or is_admin(request.user)):
-#         messages.error(request, "You are not authorized to delete this event.")
-#         return redirect('eventlist')
-#     if request.method == "POST":
-#         event.delete()
-#         messages.success(request, "Event Delete Succesfull")
-#         return redirect("eventlist")
-#     else:
-#         return render(request, "delete.html", {"object": event, "type": "Events"})
+
 class EventDelete(LoginRequiredMixin, UserPassesTestMixin,DeleteView):
     model = Events
     template_name = "delete.html"
     permission_denied_message = "You are not authorized to delete this event."
-    success_url = reverse_lazy("eventlist")
+    success_url = reverse_lazy("manage_events")
     pk_url_kwarg = 'id'
     context_object_name = 'event'
 
     def test_func(self):
        event = self.get_object()
-       return self.request.user == event.organizer or self.request.user.is_superuser
+       return is_admin(self.request.user) or self.request.user == event.organizer
     def handle_no_permission(self):
         messages.error(self.request, self.permission_denied_message)
-        return redirect('eventlist')
+        return redirect('manage_events')
     def delete(self, request, *args, **kwargs):
         messages.success(request, "Event Delete Successful")
         return super().delete(request, *args, **kwargs)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["type"] = "Events"
+        context["base_template"] = "dashboard/base.html" if self.request.user.is_authenticated else "template.html"
         return context
 
 @login_required
 @user_passes_test(is_admin)
 def category_create(request):
-    form = CategoryForm(request.POST)
-    if form.is_valid():
+    form = CategoryForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, "Category Create Succesfull")
+        messages.success(request, "Category Create Successful")
         return redirect("category_read")
-    return render(request, "form.html", {"form": form, "title": "Create Category"})
+    return render(request, "form.html", {"form": form, "title": "Create Category", "base_template": "dashboard/base.html"})
+
+@login_required
+@user_passes_test(is_admin)
 def category_read(request):
     category = Category.objects.all()
-    return render(request, "category_list.html", {'categories': category, 'is_admin': is_admin(request.user)})
+    return render(request, "category_list.html", {'categories': category, 'is_admin': True, 'base_template': "dashboard/base.html"})
+
 @login_required
 @user_passes_test(is_admin)
 def category_update(request, id):
-    category = Category.objects.get(id=id)
-    if request.method == "POST":
-        form = CategoryForm(request.POST, instance=category)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Category Update Succesfull")
-            return redirect("category_read")
-        else:
-            messages.error(request, "Category update faild")
-    else:
-        form = CategoryForm(instance=category)
-    return render(request, "form.html", {"form": form, "title": "Update Category"})
+    category = get_object_or_404(Category, id=id)
+    form = CategoryForm(request.POST or None, instance=category)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Category Update Successful")
+        return redirect("category_read")
+    return render(request, "form.html", {"form": form, "title": "Update Category", "base_template": "dashboard/base.html"})
+
 @login_required
 @user_passes_test(is_admin)
 def category_delete(request, id):
-    category = Category.objects.get(id=id)
+    category = get_object_or_404(Category, id=id)
     if request.method == "POST":
         category.delete()
-        messages.success(request, "Category Delete Succesfull")
+        messages.success(request, "Category Delete Successful")
         return redirect("category_read")
-    else:
-        return render(request, "delete.html", {"object": category, "type": "Category"})
+    return render(request, "delete.html", {"object": category, "type": "Category", "base_template": "dashboard/base.html"})
+
 @login_required
 @user_passes_test(is_admin)
 def user_list(request):
@@ -349,9 +395,9 @@ class UserPasswordResetView(PasswordResetView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['protocol'] = 'https' if self.request.is_secure() else 'http'
-        context['domain'] = self.request.get_host()
-        print(context)
+        from django.conf import settings
+        context['protocol'] = settings.SITE_PROTOCOL
+        context['domain'] = settings.SITE_DOMAIN
         return context
 
     def form_valid(self, form):
@@ -367,4 +413,3 @@ class UserPasswordResetConfirmView(PasswordResetConfirmView):
         messages.success(
             self.request, 'Password reset successfully')
         return super().form_valid(form)
-

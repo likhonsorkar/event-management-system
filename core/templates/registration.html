@@ -1,18 +1,45 @@
 {% extends 'template.html' %}
-{% block title %}Registration - Event Management System{% endblock %}
-{% block hero_title %}Welcome{% endblock %}
+
+{% block title %}Join Evently - Create Account{% endblock %}
+
 {% block content %}
-<div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-lg">
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Register to Your Account</h2>
-    <form method="post" class="space-y-6">
-        {% csrf_token %}
-        {{form}}
-        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
-            Register
-        </button>
-    </form>
-    <p class="text-center text-gray-600 mt-4">
-        Already account? <a href="{% url 'login' %}" class="text-blue-600 underline">Login Now</a>
-    </p>
+<div class="max-w-md mx-auto">
+    <div class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 p-8 rounded-2xl shadow-xl">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create Account</h2>
+            <p class="text-gray-500 dark:text-zinc-400">Join our community of event enthusiasts</p>
+        </div>
+        
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="space-y-1">
+                <label for="{{ field.id_for_label }}" class="text-sm font-medium text-gray-700 dark:text-zinc-300">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                <p class="text-xs text-gray-400 dark:text-zinc-500">{{ field.help_text }}</p>
+                {% endif %}
+                {% for error in field.errors %}
+                <p class="text-xs text-red-500">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" 
+                class="w-full mt-4 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/25">
+                Get Started
+            </button>
+        </form>
+
+        <div class="mt-8 pt-8 border-t border-gray-100 dark:border-zinc-700 text-center">
+            <p class="text-gray-600 dark:text-zinc-400">
+                Already have an account? <a href="{% url 'login' %}" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Sign In</a>
+            </p>
+        </div>
+    </div>
 </div>
+
 {% endblock %}

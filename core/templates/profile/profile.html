@@ -1,28 +1,49 @@
 {% extends "template.html" %}
 {% load static %}
-{% block title %}Profile{% endblock %}
-{% block hero_title %}My Profile{% endblock %}
+{% block title %}Profile - Evently{% endblock %}
+
 {% block content %}
-<div class="bg-white rounded-xl shadow-lg p-8 max-w-3xl mx-auto">
-    <div class="flex flex-col items-center">
-        <img src="{{ user.profile_picture.url }}"
-             alt="Profile Picture"
-             class="w-32 h-32 rounded-full border-4 border-gray-300 shadow-md object-cover">
-        <h2 class="text-2xl font-bold mt-4">Username: {{ user.username }}</h2>
-        <p class="text-gray-600">Name: {{ user.first_name }} {{user.last_name}}</p>
-        <p class="text-gray-600">Email: {{ user.email }}</p>
-        <p class="text-gray-600">Phone: {{ user.phone }}</p>
-        <div class="mt-6 flex space-x-4">
-            <a href="{% url 'edit_profile' %}"
-               class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                Edit Profile
-            </a>
-            <a href="{% url 'change_password' %}"
-               class="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition">
-                Change Password
-            </a>
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-3xl overflow-hidden shadow-xl">
+        <div class="h-32 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+        <div class="px-8 pb-8">
+            <div class="relative flex justify-center -mt-16 mb-6">
+                <div class="p-1 bg-white dark:bg-zinc-800 rounded-full">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-zinc-800 shadow-lg">
+                    {% else %}
+                        <div class="w-32 h-32 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-4xl font-bold border-4 border-white dark:border-zinc-800 shadow-lg">
+                            {{ user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="text-center space-y-2 mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ user.first_name }} {{ user.last_name }}</h2>
+                <p class="text-gray-500 dark:text-zinc-400 text-lg">@{{ user.username }}</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="p-4 bg-gray-50 dark:bg-zinc-900/50 rounded-2xl border border-gray-100 dark:border-zinc-700">
+                    <p class="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase mb-1">Email Address</p>
+                    <p class="text-gray-900 dark:text-white font-medium">{{ user.email }}</p>
+                </div>
+                <div class="p-4 bg-gray-50 dark:bg-zinc-900/50 rounded-2xl border border-gray-100 dark:border-zinc-700">
+                    <p class="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase mb-1">Phone Number</p>
+                    <p class="text-gray-900 dark:text-white font-medium">{{ user.phone|default:"Not provided" }}</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="{% url 'edit_profile' %}" class="flex-1 text-center py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/25">
+                    Edit Profile
+                </a>
+                <a href="{% url 'change_password' %}" class="flex-1 text-center py-3 px-6 bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 text-gray-900 dark:text-white font-semibold rounded-xl transition-all">
+                    Change Password
+                </a>
+            </div>
         </div>
     </div>
-
 </div>
 {% endblock %}

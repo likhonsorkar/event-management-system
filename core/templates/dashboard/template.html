@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('dark') === 'true' }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Evently - Memorable Events{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae0fd',
+                            300: '#7cc8fb',
+                            400: '#38acf8',
+                            500: '#0e91e9',
+                            600: '#0273ca',
+                            700: '#035ba3',
+                            800: '#074e86',
+                            900: '#0c4170',
+                            950: '#08294a',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        /* Global Form Styles */
+        input[type="text"], input[type="email"], input[type="password"], input[type="url"], input[type="date"], input[type="time"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 0.75rem 1.25rem;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+        }
+        .dark input[type="text"], .dark input[type="email"], .dark input[type="password"], .dark input[type="url"], .dark input[type="date"], .dark input[type="time"], .dark input[type="number"], .dark textarea, .dark select {
+            background-color: #0f172a;
+            border-color: #1e293b;
+            color: #f1f5f9;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .premium-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-500">
+    <div class="container mx-auto py-6 min-h-screen">
+        {% if messages %}
+        <div class="max-w-4xl mx-auto space-y-4 mb-12">
+            {% for message in messages %}
+            <div class="flex items-center p-5 rounded-[1.5rem] border-2 shadow-sm {% if message.tags == 'success' %}bg-emerald-50/50 border-emerald-100 text-emerald-800 dark:bg-emerald-900/10 dark:border-emerald-900/30 dark:text-emerald-400{% elif message.tags == 'error' %}bg-rose-50/50 border-rose-100 text-rose-800 dark:bg-rose-900/10 dark:border-rose-900/30 dark:text-rose-400{% else %}bg-brand-50/50 border-brand-100 text-brand-800 dark:bg-brand-900/10 dark:border-brand-900/30 dark:text-brand-400{% endif %}">
+                <span class="font-bold text-sm">{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}
+            {% block dashboard_content %}{% endblock %}
+        {% endblock %}
+    </div>
+</body>
+</html>
